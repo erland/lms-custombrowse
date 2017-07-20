@@ -1017,6 +1017,11 @@ sub imageCacheFiles {
 }
 
 
+sub postDBConnect {
+        my ($class, $dbh) = @_;
+        createSQLiteFunctions($dbh);
+}
+
 sub initPlugin {
 	my $class = shift;
 	$class->SUPER::initPlugin(@_);
@@ -1037,7 +1042,13 @@ sub initPlugin {
 	}
 
 	if($driver eq 'SQLite') {
-		createSQLiteFunctions();
+		if (UNIVERSAL::can(Slim::Utils::OSDetect->getOS()->sqlHelperClass(),"addPostConnectHandler")) {
+			$log->debug("Setting up custom SQL functions in SQLite using 7.9 API");
+			Slim::Utils::OSDetect->getOS()->sqlHelperClass()->addPostConnectHandler($class);
+		}else {
+			$log->debug("Setting up custom SQL functions in SQLite using pre 7.9 API");
+			createSQLiteFunctions();
+		}
 	}
 
 	checkDefaults();
@@ -1266,12 +1277,16 @@ sub postinitPlugin {
 sub rescanDone {
 	$lastScanTime = Slim::Music::Import->lastScanTime;
 	if($driver eq 'SQLite') {
-		createSQLiteFunctions();
+		if (!UNIVERSAL::can(Slim::Utils::OSDetect->getOS()->sqlHelperClass(),"addPostConnectHandler")) {
+			createSQLiteFunctions();
+		}
 	}
 }
 
 sub createSQLiteFunctions {
-	my $dbh = Slim::Schema->storage->dbh();
+        my $dbh = shift;
+	$log->debug("Setting up custom SQL functions in SQLite");
+	$dbh ||= Slim::Schema->storage->dbh();
 	$dbh->func('from_unixtime', 1, sub {
 		my ($seconds) = @_;
 		return Slim::Utils::DateTime::shortDateF($seconds).' '.Slim::Utils::DateTime::timeF($seconds);
