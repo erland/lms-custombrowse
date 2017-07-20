@@ -268,9 +268,9 @@ sub setModeBrowse {
 		Slim::Buttons::Common::popMode($client);
 		return;
 	}
-	my $licenseManager = isPluginsInstalled($client,'LicenseManagerPlugin');
-	my $request = Slim::Control::Request::executeRequest($client,['licensemanager','validate','application:CustomBrowse']);
-	my $licensed = $request->getResult("result");
+	my $licenseManager = 1; #isPluginsInstalled($client,'LicenseManagerPlugin');
+	#my $request = Slim::Control::Request::executeRequest($client,['licensemanager','validate','application:CustomBrowse']);
+	my $licensed = 1; #$request->getResult("result");
 
 	if($licenseManager && $licensed) {
 		#readBrowseConfiguration($client);
@@ -2311,9 +2311,9 @@ sub handleWebList {
 		$params->{'pluginCustomBrowseScanWarning'} = 1;
 	}
 
-	$params->{'licensemanager'} = isPluginsInstalled($client,'LicenseManagerPlugin');
-	my $request = Slim::Control::Request::executeRequest($client,['licensemanager','validate','application:CustomBrowse']);
-	$params->{'licensed'} = $request->getResult("result");
+	$params->{'licensemanager'} = 1; #isPluginsInstalled($client,'LicenseManagerPlugin');
+	#my $request = Slim::Control::Request::executeRequest($client,['licensemanager','validate','application:CustomBrowse']);
+	$params->{'licensed'} = 1; #$request->getResult("result");
         return Slim::Web::HTTP::filltemplatefile('plugins/CustomBrowse/custombrowse_list.html', $params);
 }
 
@@ -3605,9 +3605,9 @@ sub cliJiveHandler {
 	}else {
 	}
 
-	my $licenseManager = isPluginsInstalled($client,'LicenseManagerPlugin');
-	my $validateRequest = Slim::Control::Request::executeRequest($client,['licensemanager','validate','application:CustomBrowse']);
-	my $licensed = $validateRequest->getResult("result");
+	my $licenseManager = 1; #isPluginsInstalled($client,'LicenseManagerPlugin');
+	#my $validateRequest = Slim::Control::Request::executeRequest($client,['licensemanager','validate','application:CustomBrowse']);
+	my $licensed = 1; #$validateRequest->getResult("result");
 
 	if($licenseManager && $licensed) {
 		cliJiveHandlerImpl($client,$request,$context);
